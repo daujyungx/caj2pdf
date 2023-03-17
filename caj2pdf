@@ -2,6 +2,7 @@
 
 import os
 import argparse
+import json
 from cajparser import CAJParser
 from utils import add_outlines
 
@@ -28,6 +29,7 @@ if __name__ == "__main__":
 
     toc_parser = subparsers.add_parser("toc", help="Show the outlines of the CAJ file.")
     toc_parser.add_argument("input", help="Path to the CAJ file.")
+    toc_parser.add_argument("-o", "--output", help="Output path to the outlines JSON file.", required=False)
 
     args = parser.parse_args()
 
@@ -55,10 +57,16 @@ if __name__ == "__main__":
         caj.convert(args.output)
 
     if args.command == "outlines":
-        caj = CAJParser(args.input)
-        if caj.format == "PDF" or caj.format == "KDH":
-            raise SystemExit("Unsupported file type: {0}.".format(caj.format))
-        toc = caj.get_toc()
+        if args.input.lower().endswith(".json"):
+            inputFile = open(args.output, "r", encoding="utf-8")
+            tocJson = inputFile.read()
+            inputFile.close()
+            toc = list(map(lambda x: {"title": x["title"].encode("utf-8"), "page": x["page"], "level": x["level"]}, json.loads(tocJson)))
+        else:
+            caj = CAJParser(args.input)
+            if caj.format == "PDF" or caj.format == "KDH":
+                raise SystemExit("Unsupported file type: {0}.".format(caj.format))
+            toc = caj.get_toc()
         add_outlines(toc, args.output, "tmp.pdf")
         os.replace("tmp.pdf", args.output)
 
@@ -73,4 +81,11 @@ if __name__ == "__main__":
     if args.command == "toc":
         caj = CAJParser(args.input)
         toc = caj.get_toc(verbose=True)
-        print(list(map(lambda x: {"title": x["title"].decode("utf-8"), "page": x["page"], "level": x["level"]}, toc)))
+        tocJson = json.dumps(list(map(lambda x: {"title": x["title"].decode("utf-8"), "page": x["page"], "level": x["level"]}, toc)))
+        print(json.loads(tocJson))
+        if args.output is not None:
+            if not args.output.lower().endswith(".json"):
+                args.output += ".json"
+            outputFile = open(args.output, "w", encoding="utf-8")
+            outputFile.write(tocJson)
+            outputFile.close()
