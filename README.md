@@ -36,12 +36,15 @@ cc -Wall `pkg-config --cflags jbig2dec` -fPIC -shared -o libjbig2codec.so decode
 
 - Python 3.3+
 - [PyPDF2](https://github.com/mstamy2/PyPDF2)
+  安装参考: https://pypi.org/project/PyPDF2/
 - [mutool](https://mupdf.com/index.html)
+  安装参考: https://pypi.org/project/caj2pdf-restructured/
 
 除了Microsoft Windows：我们提供Microsoft Windows 32-bit/64-bit DLLs，HN 格式需要
 
 - C/C++编译器
 - libpoppler开发包，或libjbig2dec开发包
+  安装参考: https://pypi.org/project/caj2pdf-restructured/
 
 ### 用法
 

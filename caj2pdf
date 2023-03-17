@@ -26,6 +26,9 @@ if __name__ == "__main__":
     text_extract_parser = subparsers.add_parser("text-extract", help="Parse CAJ file for debugging/development")
     text_extract_parser.add_argument("input", help="Path to the CAJ file.")
 
+    toc_parser = subparsers.add_parser("toc", help="Show the outlines of the CAJ file.")
+    toc_parser.add_argument("input", help="Path to the CAJ file.")
+
     args = parser.parse_args()
 
     if args.command == "show":
@@ -66,3 +69,8 @@ if __name__ == "__main__":
     if args.command == "parse":
         caj = CAJParser(args.input)
         caj.parse()
+
+    if args.command == "toc":
+        caj = CAJParser(args.input)
+        toc = caj.get_toc(verbose=True)
+        print(list(map(lambda x: {"title": x["title"].decode("utf-8"), "page": x["page"], "level": x["level"]}, toc)))
